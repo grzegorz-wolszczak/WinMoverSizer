@@ -1,0 +1,31 @@
+﻿<Window x:Class="WinMoverSizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WinMoverSizer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <!-- <RowDefinition Height="Auto"/> -->
+            <!-- <RowDefinition Height="*"/> -->
+        </Grid.RowDefinitions>
+        <Button Click="ExitButtonClick" HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                MinHeight="30"
+                Margin="10"
+                > Exit Application</Button>
+        <Label Grid.Row="1" x:Name="labelMousePosition" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
+        <Label Grid.Row="2" x:Name="labelWindowUnderMouse" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
+        <Label Grid.Row="3" x:Name="labelIsKeyShortuctForWindowMovementPressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
+        <Label Grid.Row="4" x:Name="labelIsKeyShortcutForWindowResizePressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
+        <TextBlock Grid.Row="5" Padding="20" Margin="20"  x:Name="debugTextBlock"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gainsboro" ></TextBlock>
+    </Grid>
+</Window>

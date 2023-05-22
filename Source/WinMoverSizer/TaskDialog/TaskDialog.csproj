@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>disable</Nullable>
+        <UseWPF>true</UseWPF>
+        <RootNamespace>TaskDialogInterop</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <NoWarn>CA1003,CA2211,CA1815,CA1060,CA2101,CA1806,CA1021,CA1030,CA1033,CA1507,CA1307,CA1502,CA1310,CA1812,CA1825</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
+      <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\cmdarr1.png" />
+        <Resource Include="Resources\cmdarr2.png" />
+        <Resource Include="Resources\exparr-down1.bmp" />
+        <Resource Include="Resources\exparr-down2.bmp" />
+        <Resource Include="Resources\exparr-down3.bmp" />
+        <Resource Include="Resources\exparr-up1.bmp" />
+        <Resource Include="Resources\exparr-up2.bmp" />
+        <Resource Include="Resources\exparr-up3.bmp" />
+    </ItemGroup>
+
+</Project>

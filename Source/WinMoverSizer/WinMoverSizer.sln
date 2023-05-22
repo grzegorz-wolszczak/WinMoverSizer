@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinMoverSizer", "WinMoverSizer\WinMoverSizer.csproj", "{E5184B51-653A-413F-93E0-8BDBBD10A79C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskDialog", "TaskDialog\TaskDialog.csproj", "{DEA7D0FE-FE77-4D91-9099-B1631D48AEA8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5184B51-653A-413F-93E0-8BDBBD10A79C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5184B51-653A-413F-93E0-8BDBBD10A79C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5184B51-653A-413F-93E0-8BDBBD10A79C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5184B51-653A-413F-93E0-8BDBBD10A79C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEA7D0FE-FE77-4D91-9099-B1631D48AEA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEA7D0FE-FE77-4D91-9099-B1631D48AEA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEA7D0FE-FE77-4D91-9099-B1631D48AEA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEA7D0FE-FE77-4D91-9099-B1631D48AEA8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
