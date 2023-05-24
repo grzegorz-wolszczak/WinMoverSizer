@@ -111,7 +111,7 @@ public class VistaActiveTaskDialog : IActiveTaskDialog
         // TDM_SET_PROGRESS_BAR_RANGE          = WM_USER+105, // lParam = MAKELPARAM(nMinRange, nMaxRange)
         // #define MAKELPARAM(l, h)      ((LPARAM)(DWORD)MAKELONG(l, h))
         // #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
-        IntPtr lparam = (IntPtr)((((Int32)minRange) & 0xffff) | ((((Int32)maxRange) & 0xffff) << 16));
+        IntPtr lparam = (IntPtr)((minRange & 0xffff) | ((maxRange & 0xffff) << 16));
         return VistaUnsafeNativeMethods.SendMessage(
             handle,
             (uint)VistaUnsafeNativeMethods.TASKDIALOG_MESSAGES.TDM_SET_PROGRESS_BAR_RANGE,
@@ -363,7 +363,7 @@ public class VistaActiveTaskDialog : IActiveTaskDialog
             handle,
             (uint)VistaUnsafeNativeMethods.TASKDIALOG_MESSAGES.TDM_SET_BUTTON_ELEVATION_REQUIRED_STATE,
             (IntPtr)buttonId,
-            (IntPtr)(elevationRequired ? new IntPtr(1) : IntPtr.Zero));
+            elevationRequired ? new IntPtr(1) : IntPtr.Zero);
     }
 
     /// <summary>

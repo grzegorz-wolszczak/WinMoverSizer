@@ -13,19 +13,27 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <!-- <RowDefinition Height="Auto"/> -->
             <!-- <RowDefinition Height="*"/> -->
         </Grid.RowDefinitions>
-        <Button Click="ExitButtonClick" HorizontalAlignment="Left"
+        <Label Grid.Row="0" Margin="10"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch" FontSize="15" >
+            &#xA;LeftAlt + LeftMouseButton to move, LeftAlt + RightMouseButton to resize
+            &#xA;Note: close button will minimize app to tray
+        </Label>
+        <Button Grid.Row="1" Click="ExitButtonClick" HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 MinHeight="30"
                 Margin="10"
-                > Exit Application</Button>
-        <Label Grid.Row="1" x:Name="labelMousePosition" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
-        <Label Grid.Row="2" x:Name="labelWindowUnderMouse" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
-        <Label Grid.Row="3" x:Name="labelIsKeyShortuctForWindowMovementPressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
-        <Label Grid.Row="4" x:Name="labelIsKeyShortcutForWindowResizePressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" Background="Bisque"/>
-        <TextBlock Grid.Row="5" Padding="20" Margin="20"  x:Name="debugTextBlock"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gainsboro" ></TextBlock>
+                Padding="10"
+        > Exit Application</Button>
+        <Label Grid.Row="2" Margin="1" x:Name="labelMousePosition" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="13" Background="Bisque"/>
+        <Label Grid.Row="3" Margin="1" x:Name="labelWindowUnderMouse" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="13" Background="Bisque"/>
+        <Label Grid.Row="4" Margin="1" x:Name="labelIsKeyShortuctForWindowMovementPressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="13" Background="Bisque"/>
+        <Label Grid.Row="5" Margin="1" x:Name="labelIsKeyShortcutForWindowResizePressed" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="13" Background="Bisque"/>
+        <TextBlock Grid.Row="6" Padding="1" Margin="1"  x:Name="debugTextBlock"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gainsboro" ></TextBlock>
     </Grid>
 </Window>

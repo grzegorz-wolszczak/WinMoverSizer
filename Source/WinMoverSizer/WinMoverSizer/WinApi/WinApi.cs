@@ -10,10 +10,9 @@ public static class WinApiHelper
    private const int S_OK = 0;
    private const int KEY_PRESSED = 0x8000;
 
-
    private static readonly IntPtr DesktopHandle = GetDesktop();
 
-   [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+   [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
    public static extern IntPtr GetParent(IntPtr hWnd);
 
    [DllImport("user32.dll")]
@@ -30,7 +29,6 @@ public static class WinApiHelper
 
    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
    private static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string lclassName, string windowTitle);
-
 
    [DllImport("user32.dll")]
    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
@@ -53,11 +51,13 @@ public static class WinApiHelper
    private static extern bool GetCursorPos(out POINT lpPoint);
 
    private static IntPtr _hookHandle = IntPtr.Zero;
+
    private static MouseHookCallback _hookCallback;
+
    // from https://learn.microsoft.com/en-us/windows/win32/inputdev/mouse-input-notifications
    private const int WH_MOUSE_LL = 14;
    private const int WM_MOUSEMOVE = 0x200;
-   private const int WM_MBUTTONDOWN  = 0x0207;
+   private const int WM_MBUTTONDOWN = 0x0207;
    private const int WM_RBUTTONDOWN = 0x0204;
    private const int WM_LBUTTONDOWN = 0x0201;
 
@@ -132,8 +132,8 @@ public static class WinApiHelper
    public static IntPtr GetWindowFromPoint(PositionOnDesktop position)
    {
       POINT mousePosition = new POINT();
-      mousePosition.x = (int) position.X;
-      mousePosition.y = (int) position.Y;
+      mousePosition.x = position.X;
+      mousePosition.y = position.Y;
       var windowHandle = WindowFromPoint(mousePosition);
       return windowHandle;
       // if (windowHandle == IntPtr.Zero)
@@ -205,6 +205,7 @@ public static class WinApiHelper
       {
          return;
       }
+
       UnhookWindowsHookEx(_hookHandle);
       _hookHandle = IntPtr.Zero;
    }
@@ -223,6 +224,4 @@ public static class WinApiHelper
    {
       return windowHandle == DesktopHandle;
    }
-
-
 }

@@ -9,7 +9,7 @@ namespace TaskDialogInterop;
 /// </summary>
 public class TaskDialogViewModel : IActiveTaskDialog, INotifyPropertyChanged
 {
-    private static readonly TimeSpan CallbackTimerInterval = new TimeSpan(0, 0, 0, 0, 200);
+    private static readonly TimeSpan CallbackTimerInterval = new(0, 0, 0, 0, 200);
 
     private static bool? _isInDesignMode;
     [System.Diagnostics.CodeAnalysis.SuppressMessage(

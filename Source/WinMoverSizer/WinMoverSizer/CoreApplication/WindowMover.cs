@@ -7,6 +7,7 @@ namespace WinMoverSizer.CoreApplication;
 public class WindowMover : IWinMoverStateObserver
 {
    private WinDraggerState? _previousState;
+
    public void Notify(WinDraggerState state)
    {
       if (_previousState == null)
@@ -41,11 +42,11 @@ public class WindowMover : IWinMoverStateObserver
       var rect = currentState.WindowUnderMouse.Rect;
       var handle = currentState.WindowUnderMouse.Handle;
 
-      var rectLeft = (int)(rect.Left + deltaX);
-      var rectTop = (int)(rect.Top + deltaY);
+      var rectLeft = rect.Left + deltaX;
+      var rectTop = rect.Top + deltaY;
 
-      int height = rect.Bottom - rect.Top ;
-      var width = rect.Right - rect.Left ;
+      int height = rect.Bottom - rect.Top;
+      var width = rect.Right - rect.Left;
 
       WinApiHelper.SetWindowPosition(handle, rectLeft, rectTop, width, height);
    }

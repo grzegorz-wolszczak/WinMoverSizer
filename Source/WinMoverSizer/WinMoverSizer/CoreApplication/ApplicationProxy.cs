@@ -3,7 +3,6 @@
 public interface IApplicationProxy
 {
    void Exit();
-
 }
 
 public class ApplicationProxy : IApplicationProxy
@@ -20,6 +19,4 @@ public class ApplicationProxy : IApplicationProxy
    {
       _app.Shutdown();
    }
-
 }
-

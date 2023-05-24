@@ -8,5 +8,5 @@ public record WindowUnderMouse
    public IntPtr Handle {get; init;}
    public RECT Rect  {get; init;}
 
-   public static readonly WindowUnderMouse Null = new WindowUnderMouse();
+   public static readonly WindowUnderMouse Null = new();
 }

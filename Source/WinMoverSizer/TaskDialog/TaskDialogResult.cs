@@ -65,7 +65,7 @@ public class TaskDialogResult
     /// <summary>
     /// Represents a result with no data.
     /// </summary>
-    public static readonly TaskDialogResult Empty = new TaskDialogResult();
+    public static readonly TaskDialogResult Empty = new();
 
     /// <summary>
     /// Gets the <see cref="T:TaskDialogSimpleResult"/> of the TaskDialog.

@@ -16,8 +16,7 @@ public class MainWindowProxy : IMainWindowProxy, IWinMoverStateObserver
 
    public void ShowWindow()
    {
-      //if (_mainWindow.WindowState == WindowState.Minimized)
-         _mainWindow.WindowState = WindowState.Normal;
+      _mainWindow.WindowState = WindowState.Normal;
       _mainWindow.Activate();
       _mainWindow.Show();
    }
@@ -35,9 +34,5 @@ public class MainWindowProxy : IMainWindowProxy, IWinMoverStateObserver
    public void Notify(WinDraggerState state)
    {
       _mainWindow.UpdateControlsFromState(state);
-      //_mainWindow.labelWindowUnderMouse.Content =  $"Window under mouse handle : {state.WindowUnderMouse?.Handle}";
-      //_mainWindow.labelMousePosition.Content = $"Mouse: {state.MousePositionRelativeToDesktopPosition}";
-      // todo:
-      // display state
    }
 }

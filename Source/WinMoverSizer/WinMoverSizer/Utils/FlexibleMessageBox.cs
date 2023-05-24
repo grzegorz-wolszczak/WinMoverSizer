@@ -291,7 +291,7 @@ public class FlexibleMessageBox
       //
       // button1
       //
-      button1.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
+      button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
       button1.AutoSize = true;
       button1.DialogResult = DialogResult.OK;
       button1.Location = new Point(11, 67);
@@ -305,13 +305,13 @@ public class FlexibleMessageBox
       //
       // richTextBoxMessage
       //
-      richTextBoxMessage.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
-                                                    | AnchorStyles.Left)
-                                                   | AnchorStyles.Right)));
+      richTextBoxMessage.Anchor = ((AnchorStyles.Top | AnchorStyles.Bottom)
+                                   | AnchorStyles.Left)
+                                  | AnchorStyles.Right;
       richTextBoxMessage.BackColor = Color.White;
       richTextBoxMessage.BorderStyle = BorderStyle.None;
       richTextBoxMessage.DataBindings.Add(new Binding("Text", FlexibleMessageBoxFormBindingSource, "MessageText", true, DataSourceUpdateMode.OnPropertyChanged));
-      richTextBoxMessage.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+      richTextBoxMessage.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
       richTextBoxMessage.Location = new Point(50, 26);
       richTextBoxMessage.Margin = new Padding(0);
       richTextBoxMessage.Name = "richTextBoxMessage";
@@ -325,9 +325,9 @@ public class FlexibleMessageBox
       //
       // panel1
       //
-      panel1.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
-                                        | AnchorStyles.Left)
-                                       | AnchorStyles.Right)));
+      panel1.Anchor = ((AnchorStyles.Top | AnchorStyles.Bottom)
+                       | AnchorStyles.Left)
+                      | AnchorStyles.Right;
       panel1.BackColor = Color.White;
       panel1.Controls.Add(pictureBoxForIcon);
       panel1.Controls.Add(richTextBoxMessage);
@@ -347,7 +347,7 @@ public class FlexibleMessageBox
       //
       // button2
       //
-      button2.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
+      button2.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
       button2.DialogResult = DialogResult.OK;
       button2.Location = new Point(92, 67);
       button2.MinimumSize = new Size(0, 24);
@@ -360,7 +360,7 @@ public class FlexibleMessageBox
       //
       // button3
       //
-      button3.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
+      button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
       button3.AutoSize = true;
       button3.DialogResult = DialogResult.OK;
       button3.Location = new Point(173, 67);

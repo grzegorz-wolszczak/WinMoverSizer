@@ -6,23 +6,19 @@ namespace WinMoverSizer.CoreApplication;
 
 public static class CooridantesCalculator
 {
-
    public static WindowCoordinates CalculateNewWindowCoordinates(RECT rect, PositionOnDesktop currentMousePosition,
       PositionOnDesktop? nullablePreviousMousePosition)
    {
-
       var windowWidth = rect.Right - rect.Left;
       var windowHeight = rect.Bottom - rect.Top;
 
-      var windowCoordinates = new WindowCoordinates() // original cooridantes
+      var windowCoordinates = new WindowCoordinates()
       {
          Height = windowHeight,
          Width = windowWidth,
          X = rect.Left,
          Y = rect.Top
       };
-
-      //return windowCoordinates;
 
       if (nullablePreviousMousePosition == null)
       {
@@ -42,32 +38,30 @@ public static class CooridantesCalculator
          // if mouse cursor is on the 'right' half of the window
          if (currentMousePosition.X >= widthHalfPointCoordinate)
          {
-            windowCoordinates.Width += (int)horizontalMovementDelta;
+            windowCoordinates.Width += horizontalMovementDelta;
          }
          else
          {
-            windowCoordinates.Width -= (int)horizontalMovementDelta;
-            windowCoordinates.X += (int) horizontalMovementDelta;
+            windowCoordinates.Width -= horizontalMovementDelta;
+            windowCoordinates.X += horizontalMovementDelta;
          }
       }
 
 
-      if (verticalMovementDelta != 0)
+      if (verticalMovementDelta == 0) return windowCoordinates;
+
+      // if mouse cursor is on the 'bottom' half of the window
+      if (currentMousePosition.Y >= heightHalfPointCoordinate)
       {
-         // if mouse cursor is on the 'bottom' half of the window
-         if (currentMousePosition.Y >= heightHalfPointCoordinate)
-         {
-            windowCoordinates.Height += (int)verticalMovementDelta;
-         }
-         else
-         {
-            windowCoordinates.Height -= (int)verticalMovementDelta;
-            windowCoordinates.Y += (int) verticalMovementDelta;
-         }
+         windowCoordinates.Height += verticalMovementDelta;
+      }
+      else
+      {
+         windowCoordinates.Height -= verticalMovementDelta;
+         windowCoordinates.Y += verticalMovementDelta;
       }
 
 
       return windowCoordinates;
-
    }
 }

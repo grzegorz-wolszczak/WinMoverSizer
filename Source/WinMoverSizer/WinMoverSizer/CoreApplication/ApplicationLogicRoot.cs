@@ -37,7 +37,6 @@ public class ApplicationLogicRoot
       _moverSizer.RegisterStateObserver(mainWindowProxy);
       _moverSizer.RegisterStateObserver(windowResizer);
       _moverSizer.RegisterStateObserver(windowMover);
-
    }
 
    public void Start()
@@ -45,7 +44,6 @@ public class ApplicationLogicRoot
       _mainWindow.InitializeComponent();
       ShowMainWindow();
       _moverSizer.StartMonitoring();
-
    }
 
    private void ShowMainWindow()

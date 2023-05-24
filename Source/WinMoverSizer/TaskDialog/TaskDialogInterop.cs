@@ -1089,7 +1089,7 @@ public class VistaTaskDialog
             {
                 // Hand marshal the buttons array.
                 int elementSize = Marshal.SizeOf(typeof(VistaTaskDialogButton));
-                config.pButtons = Marshal.AllocHGlobal(elementSize * (int)customButtons.Length);
+                config.pButtons = Marshal.AllocHGlobal(elementSize * customButtons.Length);
                 for (int i = 0; i < customButtons.Length; i++)
                 {
                     unsafe // Unsafe because of pointer arithmatic.
@@ -1107,7 +1107,7 @@ public class VistaTaskDialog
             {
                 // Hand marshal the buttons array.
                 int elementSize = Marshal.SizeOf(typeof(VistaTaskDialogButton));
-                config.pRadioButtons = Marshal.AllocHGlobal(elementSize * (int)customRadioButtons.Length);
+                config.pRadioButtons = Marshal.AllocHGlobal(elementSize * customRadioButtons.Length);
                 for (int i = 0; i < customRadioButtons.Length; i++)
                 {
                     unsafe // Unsafe because of pointer arithmatic.

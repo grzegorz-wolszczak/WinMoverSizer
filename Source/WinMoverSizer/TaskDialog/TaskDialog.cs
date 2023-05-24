@@ -8,8 +8,8 @@ public partial class TaskDialog
     private const string HtmlHyperlinkPattern = "<a href=\".+\">.+</a>";
     private const string HtmlHyperlinkCapturePattern = "<a href=\"(?<link>.+)\">(?<text>.+)</a>";
 
-    private static readonly Regex _hyperlinkRegex = new Regex(HtmlHyperlinkPattern);
-    private static readonly Regex _hyperlinkCaptureRegex = new Regex(HtmlHyperlinkCapturePattern);
+    private static readonly Regex _hyperlinkRegex = new(HtmlHyperlinkPattern);
+    private static readonly Regex _hyperlinkCaptureRegex = new(HtmlHyperlinkCapturePattern);
 
     internal const int CommandButtonIDOffset = 2000;
     internal const int RadioButtonIDOffset = 1000;
@@ -544,8 +544,8 @@ public partial class TaskDialog
 
         result = new TaskDialogResult(
             simpResult,
-            (String.IsNullOrEmpty(options.VerificationText) ? null : (bool?)verificationChecked),
-            ((options.RadioButtons == null || options.RadioButtons.Length == 0) ? null : (int?)radioButtonResult),
+            (String.IsNullOrEmpty(options.VerificationText) ? null : verificationChecked),
+            ((options.RadioButtons == null || options.RadioButtons.Length == 0) ? null : radioButtonResult),
             ((options.CommandButtons == null || options.CommandButtons.Length == 0) ? null : commandButtonResult),
             ((options.CustomButtons == null || options.CustomButtons.Length == 0) ? null : customButtonResult));
 
@@ -604,8 +604,8 @@ public partial class TaskDialog
 
         result = new TaskDialogResult(
             simpResult,
-            (String.IsNullOrEmpty(options.VerificationText) ? null : (bool?)verificationChecked),
-            ((options.RadioButtons == null || options.RadioButtons.Length == 0) ? null : (int?)radioButtonResult),
+            (String.IsNullOrEmpty(options.VerificationText) ? null : verificationChecked),
+            ((options.RadioButtons == null || options.RadioButtons.Length == 0) ? null : radioButtonResult),
             ((options.CommandButtons == null || options.CommandButtons.Length == 0) ? null : commandButtonResult),
             ((options.CustomButtons == null || options.CustomButtons.Length == 0) ? null : customButtonResult));
 

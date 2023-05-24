@@ -37,7 +37,6 @@ public class TrayIconProxy
       _menu.Items.Add(new ToolStripMenuItem("Show", null, ShowMainWindow!, "Show"));
       _menu.Items.Add(new ToolStripMenuItem("Exit", null, ApplicationCloseClickHandler!, "Exit"));
       _notifyIcon.ContextMenuStrip = _menu;
-
    }
 
    private void ShowMainWindow(object sender, EventArgs eventArgs)

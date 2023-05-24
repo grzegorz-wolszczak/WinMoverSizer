@@ -1,9 +1,9 @@
 ﻿namespace WinMoverSizer.Models;
 
-public class WindowCoordinates
+public record WindowCoordinates
 {
-   public int X;
-   public int Y;
-   public int Width;
-   public int Height;
+   public int X { get; set; }
+   public int Y { get; set; }
+   public int Width { get; set; }
+   public int Height { get; set; }
 }

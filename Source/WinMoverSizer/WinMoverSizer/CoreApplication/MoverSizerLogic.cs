@@ -9,7 +9,7 @@ public class MoverSizerLogic
 {
    private List<IWinMoverStateObserver> _stateObservers = new();
 
-   private static readonly HashSet<string> ClassNamesForWindowsThatShouldNotBeMovedOrResized = new HashSet<string>()
+   private static readonly HashSet<string> ClassNamesForWindowsThatShouldNotBeMovedOrResized = new()
    {
       "Shell_TrayWnd", // elements on ms windows task bar and in the tray
       "Shell_SecondaryTrayWnd", // task bar on other desktops (not in primary)
@@ -86,7 +86,8 @@ public class MoverSizerLogic
       var classNamesForDialogs = new HashSet<string>()
       {
          "#32770", // '#32770' means - Ms Windows dialog window
-         "SunAwtDialog", // AWT java dialog window (Jetbrains Rider)
+         "SunAwtDialog", // AWT java dialog window (e.g. Jetbrains Rider find files window)
+         "SunAwtWindow" // AWT java window (e.g. Jetbrains Rider project manager window)
       };
       if (classNamesForDialogs.Contains(className))
       {
@@ -100,7 +101,6 @@ public class MoverSizerLogic
    {
       if (!_stateObservers.Contains(stateObserver))
       {
-         // do not duplicate observer registrations
          _stateObservers.Add(stateObserver);
       }
    }
