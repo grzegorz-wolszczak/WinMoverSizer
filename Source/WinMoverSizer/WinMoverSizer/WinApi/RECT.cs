@@ -9,4 +9,7 @@ public struct RECT
    public int Top;         // y position of upper-left corner
    public int Right;       // x position of lower-right corner
    public int Bottom;      // y position of lower-right corner
+
+   public int Width => Right - Left;
+   public int Height => Bottom - Top;
 }

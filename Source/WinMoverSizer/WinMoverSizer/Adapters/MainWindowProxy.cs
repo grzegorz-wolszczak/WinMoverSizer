@@ -31,7 +31,7 @@ public class MainWindowProxy : IMainWindowProxy, IWinMoverStateObserver
       _mainWindow.Hide();
    }
 
-   public void Notify(WinDraggerState state)
+   public void Notify(MouseAndKeyboardState state)
    {
       _mainWindow.UpdateControlsFromState(state);
    }

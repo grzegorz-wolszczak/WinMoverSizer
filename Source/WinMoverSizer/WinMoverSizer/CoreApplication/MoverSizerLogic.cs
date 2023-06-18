@@ -13,41 +13,62 @@ public class MoverSizerLogic
    {
       "Shell_TrayWnd", // elements on ms windows task bar and in the tray
       "Shell_SecondaryTrayWnd", // task bar on other desktops (not in primary)
+
+      // specific use cases
+      "ZoomitClass", // window created by ZoomIt tool (https://learn.microsoft.com/en-us/sysinternals/downloads/zoomit) (it occupies entire deskttop)
    };
 
    public void StartMonitoring()
    {
-      WinApiHelper.StartMonitoringMouseMovement(OnMouseMovementChanged);
+      WinApiHelper.StartMonitoringKeyboardKeys(OnMouseOrKeyboardStateChanged);
+      WinApiHelper.StartMonitoringMouseMovement(OnMouseOrKeyboardStateChanged);
    }
 
-   private void OnMouseMovementChanged(PositionOnDesktop pointToScreen)
+   private void OnMouseOrKeyboardStateChanged()
    {
-      var currentState = new WinDraggerState();
-      currentState.IsKeyboardShortcutForResizePressed = IsKeyboardShortcutForResizePressed();
-      currentState.IsKeyboardShortcutForMovementPressed = IsKeyboardShortcutForMovementPressed();
-      currentState.MousePositionOnDesktop = pointToScreen;
+      var currentState = GetCurrentMouseAndKeyboardState();
+      HandleStateChange(currentState);
+   }
 
-      IntPtr windowUnderCursor = WinApiHelper.GetWindowFromPoint(pointToScreen);
-      WindowUnderMouse windowToOperate = FindWindowToOperateOnFromWindowOnUnderCursor(windowUnderCursor);
-
-      currentState.WindowUnderMouse = windowToOperate;
-
+   private void HandleStateChange(MouseAndKeyboardState currentState)
+   {
       foreach (var stateObserver in _stateObservers)
       {
          stateObserver.Notify(currentState);
       }
    }
 
-   private WindowUnderMouse FindWindowToOperateOnFromWindowOnUnderCursor(IntPtr windowHandle)
+
+   private MouseAndKeyboardState GetCurrentMouseAndKeyboardState()
+   {
+      PositionOnDesktop mousePosition = WinApiHelper.GetMousePosition();
+      IntPtr windowHandleUnderCursor = WinApiHelper.GetWindowFromPoint(mousePosition);
+      var originalWindowUnderCursor = GetWindowFromHandle(windowHandleUnderCursor);
+      var windowToOperate = FindWindowToOperateOnFromWindowOnUnderCursor(windowHandleUnderCursor);
+      var keyStates = WinApiHelper.GetKeyStates();
+      var windowList = WinApiHelper.GetWindowHierarchyFromPoint(mousePosition);
+      var currentState = new MouseAndKeyboardState
+      {
+         MousePositionOnDesktop = mousePosition,
+         CalculatedWindowToOperateOn = windowToOperate,
+         OriginalWindowUnderCursor = originalWindowUnderCursor,
+         KeyStates = keyStates,
+         WindowList = windowList
+      };
+
+      return currentState;
+   }
+
+   private WindowData FindWindowToOperateOnFromWindowOnUnderCursor(IntPtr windowHandle)
    {
       if (windowHandle == IntPtr.Zero)
       {
-         return WindowUnderMouse.Null;
+         return WindowData.Null;
       }
 
       if (WinApiHelper.IsDesktopWindow(windowHandle))
       {
-         return WindowUnderMouse.Null;
+         return WindowData.Null;
       }
 
       // get root window (top) for current application
@@ -58,16 +79,21 @@ public class MoverSizerLogic
 
       if (!IsWindowClassApplicableForResizeOrMove(windowHandle))
       {
-         return WindowUnderMouse.Null;
+         return WindowData.Null;
       }
 
+      return GetWindowFromHandle(windowHandle);
+   }
+
+   private static WindowData GetWindowFromHandle(IntPtr windowHandle)
+   {
       var rect = WinApiHelper.GetWindowRectApi(windowHandle, out var windowRectGetResult);
       if (!windowRectGetResult)
       {
-         return WindowUnderMouse.Null;
+         return WindowData.Null;
       }
 
-      return new WindowUnderMouse()
+      return new WindowData()
       {
          Handle = windowHandle,
          Rect = rect
@@ -108,19 +134,6 @@ public class MoverSizerLogic
    public void StopMonitoring()
    {
       WinApiHelper.StopMonitoringMouseMovement();
-   }
-
-   private bool IsKeyboardShortcutForMovementPressed()
-   {
-      var isAltPressed = WinApiHelper.IsAltPressed();
-      var isLeftMouseButtonPressed = WinApiHelper.IsLeftMouseButtonPressed();
-
-      return isAltPressed
-             && isLeftMouseButtonPressed;
-   }
-
-   private bool IsKeyboardShortcutForResizePressed()
-   {
-      return WinApiHelper.IsAltPressed() && WinApiHelper.IsRightMouseButtonPressed();
+      WinApiHelper.StopMonitoringKeyboardKeys();
    }
 }

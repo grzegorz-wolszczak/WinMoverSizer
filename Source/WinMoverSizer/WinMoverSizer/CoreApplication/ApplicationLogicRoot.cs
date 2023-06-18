@@ -1,5 +1,4 @@
-﻿using System;
-using WinMoverSizer.Adapters;
+﻿using WinMoverSizer.Adapters;
 using WinMoverSizer.Models;
 using WinMoverSizer.Tray;
 
@@ -7,7 +6,7 @@ namespace WinMoverSizer.CoreApplication;
 
 public interface IWinMoverStateObserver
 {
-   public void Notify(WinDraggerState state);
+   public void Notify(MouseAndKeyboardState state);
 }
 
 public class ApplicationLogicRoot

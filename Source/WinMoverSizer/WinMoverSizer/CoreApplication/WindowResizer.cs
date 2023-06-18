@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WinMoverSizer.Models;
 using WinMoverSizer.WinApi;
 
@@ -6,62 +7,94 @@ namespace WinMoverSizer.CoreApplication;
 
 public class WindowResizer : IWinMoverStateObserver
 {
-   private WinDraggerState? _previousState;
-   public void Notify(WinDraggerState state)
+   private MouseAndKeyboardState? _originalResizedWindowState;
+   private static readonly HashSet<int> WindowResizeKeyCombination = new() {Keys.LeftAlt, Keys.RightMouseButton};
+
+   public void Notify(MouseAndKeyboardState state)
    {
-      if (_previousState == null)
+      ActOnState(state);
+   }
+
+   private void ActOnState(MouseAndKeyboardState state)
+   {
+      if (_originalResizedWindowState == null)
       {
-         _previousState = state;
+         TryStartResizing(state);
          return;
       }
 
-      ActOnCurrentState(state);
-      _previousState = state;
+      ContinueResizingOrStop(state);
    }
 
-   private void ActOnCurrentState(WinDraggerState currentState)
+   private void ContinueResizingOrStop(MouseAndKeyboardState nowState)
    {
-      var shouldResizeWindow = ShouldResizeWindow(currentState);
-      if (shouldResizeWindow)
+      var isKeyboardForResizePressed = nowState.KeyStates.AreKeysPressed(WindowResizeKeyCombination);
+      if (!isKeyboardForResizePressed) // we stopped moving
       {
-         ResizeWindow(currentState);
+         StopResizing();
+         return;
+      }
+
+      // edge case,
+      // keyboard shortcut still pressed but windows are different ?
+      // this happens when resizing window that spans across two different (or more) desktops and we move mouse cursor over  taskbar
+
+      var isTheSameWindowStillUnderTheCursor = IsTheSameWindowStillUnderTheCursor(nowState, _originalResizedWindowState);
+      if (!isTheSameWindowStillUnderTheCursor)
+      {
+
+         // this happens when resizing window that spans across two different (or more) desktops and we move mouse cursor over  taskbar
+         // pretend that you still resizing the window that you started resizing in the first place
+         if (nowState.CalculatedWindowToOperateOn.Handle == IntPtr.Zero)
+         {
+            nowState.CalculatedWindowToOperateOn = _originalResizedWindowState.CalculatedWindowToOperateOn;
+         }
+         else
+         {
+            StopResizing();
+            return;
+         }
+
+      }
+      // continue moving
+      ResizeWindow( _originalResizedWindowState, nowState);
+   }
+
+   private void StopResizing()
+   {
+      _originalResizedWindowState = null;
+   }
+
+   private void TryStartResizing(MouseAndKeyboardState state)
+   {
+      var isKeyboardForResizePressed = state.KeyStates.AreKeysPressed(WindowResizeKeyCombination);
+      var isWindowUnderCursorResizable = IsWindowUnderCursorResizable(state);
+
+      if (isWindowUnderCursorResizable && isKeyboardForResizePressed)
+      {
+         _originalResizedWindowState = state;
       }
    }
 
-   private bool ShouldResizeWindow(WinDraggerState currentState)
+
+   private bool IsWindowUnderCursorResizable(MouseAndKeyboardState state)
    {
-      var isTheSameWindowStillUnderTheCursor = IsTheSameWindowStillUnderTheCursor(currentState);
-      var didCursorMoved = DidCursorMoved(currentState);
-      var wasKeyboardShortcutForResizeStillPressed = WasKeyboardShortcutForResizeStillPressed(currentState);
-
-
-      return isTheSameWindowStillUnderTheCursor
-             && didCursorMoved &&
-             wasKeyboardShortcutForResizeStillPressed;
+      return state.CalculatedWindowToOperateOn != null;
    }
 
-   private bool WasKeyboardShortcutForResizeStillPressed(WinDraggerState currentState)
+
+   private bool IsTheSameWindowStillUnderTheCursor(MouseAndKeyboardState nowState, MouseAndKeyboardState previousState)
    {
-      return currentState.IsKeyboardShortcutForResizePressed && _previousState.IsKeyboardShortcutForResizePressed;
+      return nowState?.CalculatedWindowToOperateOn?.Handle != IntPtr.Zero
+             && nowState?.CalculatedWindowToOperateOn.Handle == previousState.CalculatedWindowToOperateOn.Handle;
    }
 
-   private bool DidCursorMoved(WinDraggerState currentState)
-   {
-      return _previousState?.MousePositionOnDesktop != currentState.MousePositionOnDesktop;
-   }
-
-   private bool IsTheSameWindowStillUnderTheCursor(WinDraggerState currentState)
-   {
-      return _previousState?.WindowUnderMouse?.Handle != IntPtr.Zero
-             && _previousState?.WindowUnderMouse.Handle == currentState.WindowUnderMouse.Handle;
-   }
-
-   private void ResizeWindow(WinDraggerState currentState)
+   private void ResizeWindow(MouseAndKeyboardState originalResizedWindowState, MouseAndKeyboardState currentState)
    {
       WindowCoordinates newWindowCoordinates = CooridantesCalculator.CalculateNewWindowCoordinates(
-         currentState.WindowUnderMouse!.Rect,
-         currentState.MousePositionOnDesktop,
-         _previousState?.MousePositionOnDesktop);
-      WinApiHelper.SetWindowPosition(currentState.WindowUnderMouse.Handle, newWindowCoordinates);
+         originalResizedWindowState,
+         currentState
+      );
+      WinApiHelper.ChangeWindowSize(currentState.CalculatedWindowToOperateOn.Handle, newWindowCoordinates);
    }
 }

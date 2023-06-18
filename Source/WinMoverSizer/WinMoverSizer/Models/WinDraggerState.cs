@@ -1,11 +1,15 @@
-﻿namespace WinMoverSizer.Models;
+﻿using WindowSpy;
+
+namespace WinMoverSizer.Models;
 
 
-public class WinDraggerState
+public record MouseAndKeyboardState
 {
-   public PositionOnDesktop MousePositionOnDesktop;
-   public WindowUnderMouse? WindowUnderMouse = default;
-   public bool IsKeyboardShortcutForMovementPressed;
-   public bool IsKeyboardShortcutForResizePressed;
+   public PositionOnDesktop? MousePositionOnDesktop { get; init; }
+   public WindowData? CalculatedWindowToOperateOn { get; set; }
+   public WindowData? OriginalWindowUnderCursor{ get; init; }
+   public KeysPressed KeyStates { get; init; }
+
+   public WindowList WindowList { get; init; }
 
 }

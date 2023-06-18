@@ -15,15 +15,15 @@ public partial class MainWindow : Window
       Closing += OnClosing;
    }
 
-   public void UpdateControlsFromState(WinDraggerState state)
+   public void UpdateControlsFromState(MouseAndKeyboardState state)
    {
-      Dispatcher.Invoke(() =>
-      {
-         labelMousePosition.Content = $"Mouse: {state.MousePositionOnDesktop}";
-         labelWindowUnderMouse.Content = $"Window under cursor handle : {state.WindowUnderMouse?.Handle}";
-         labelIsKeyShortcutForWindowResizePressed.Content = $"Resize Key pressed? : {state.IsKeyboardShortcutForResizePressed}";
-         labelIsKeyShortuctForWindowMovementPressed.Content = $"Movement Key pressed? : {state.IsKeyboardShortcutForMovementPressed}";
-      });
+      labelMousePosition.Content = $"Cursor: {state.MousePositionOnDesktop}" + $"\nWindow handle to move: {state.CalculatedWindowToOperateOn?.Handle}";
+      //labelWindowUnderMouse.Content = $"Window handle to move: {state.CalculatedWindowToOperateOn?.Handle}";
+      var asString = state.KeyStates.AsString();
+      //keyPressedLabel.Content = $"Key pressed? : {asString}";
+      windowsHierarchyTextBlock.Text = state.WindowList.ToWindowInfoString();
+
+
    }
    private void OnClosing(object? sender, CancelEventArgs e)
    {

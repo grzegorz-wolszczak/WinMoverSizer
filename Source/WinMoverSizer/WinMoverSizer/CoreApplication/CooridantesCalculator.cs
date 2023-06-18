@@ -1,42 +1,42 @@
-﻿using System.Windows;
-using WinMoverSizer.Models;
+﻿using WinMoverSizer.Models;
 using WinMoverSizer.WinApi;
 
 namespace WinMoverSizer.CoreApplication;
 
 public static class CooridantesCalculator
 {
-   public static WindowCoordinates CalculateNewWindowCoordinates(RECT rect, PositionOnDesktop currentMousePosition,
-      PositionOnDesktop? nullablePreviousMousePosition)
+   public static WindowCoordinates CalculateNewWindowCoordinates(
+      MouseAndKeyboardState originalResizedWindowState,
+      MouseAndKeyboardState nowState
+   )
    {
-      var windowWidth = rect.Right - rect.Left;
-      var windowHeight = rect.Bottom - rect.Top;
+
+      RECT originalWindowRect = originalResizedWindowState.CalculatedWindowToOperateOn.Rect;
+      var originalMousePosition = originalResizedWindowState.MousePositionOnDesktop;
+      var currentMousePosition = nowState.MousePositionOnDesktop;
+
+      var originalWindowWidth = originalWindowRect.Width;
+      var originalWindowHeight = originalWindowRect.Height;
 
       var windowCoordinates = new WindowCoordinates()
       {
-         Height = windowHeight,
-         Width = windowWidth,
-         X = rect.Left,
-         Y = rect.Top
+         Height = originalWindowHeight,
+         Width = originalWindowWidth,
+         X = originalWindowRect.Left,
+         Y = originalWindowRect.Top
       };
 
-      if (nullablePreviousMousePosition == null)
-      {
-         return windowCoordinates;
-      }
 
-      PositionOnDesktop previousMousePosition = nullablePreviousMousePosition;
+      var horizontalMovementDelta = currentMousePosition.X - originalMousePosition.X;
+      var verticalMovementDelta = currentMousePosition.Y - originalMousePosition.Y;
 
-      var horizontalMovementDelta = currentMousePosition.X - previousMousePosition.X;
-      var verticalMovementDelta = currentMousePosition.Y - previousMousePosition.Y;
-
-      var widthHalfPointCoordinate = (windowWidth / 2) + rect.Left;
-      var heightHalfPointCoordinate = (windowHeight / 2) + rect.Top;
+      var widthHalfPointCoordinate = (originalWindowWidth / 2) + originalWindowRect.Left;
+      var heightHalfPointCoordinate = (originalWindowHeight / 2) + originalWindowRect.Top;
 
       if (horizontalMovementDelta != 0)
       {
          // if mouse cursor is on the 'right' half of the window
-         if (currentMousePosition.X >= widthHalfPointCoordinate)
+         if (originalMousePosition.X >= widthHalfPointCoordinate)
          {
             windowCoordinates.Width += horizontalMovementDelta;
          }
@@ -51,7 +51,7 @@ public static class CooridantesCalculator
       if (verticalMovementDelta == 0) return windowCoordinates;
 
       // if mouse cursor is on the 'bottom' half of the window
-      if (currentMousePosition.Y >= heightHalfPointCoordinate)
+      if (originalMousePosition.Y >= heightHalfPointCoordinate)
       {
          windowCoordinates.Height += verticalMovementDelta;
       }
