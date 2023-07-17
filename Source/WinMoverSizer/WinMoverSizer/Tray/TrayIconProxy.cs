@@ -6,7 +6,7 @@ using WinMoverSizer.Ports;
 
 namespace WinMoverSizer.Tray;
 
-public class TrayIconProxy
+public sealed class TrayIconProxy
 {
    private IMainWindowProxy _mainWindowProxy;
    private readonly IApplicationProxy _applicationProxy;

@@ -9,7 +9,7 @@ public interface IWinMoverStateObserver
    public void Notify(MouseAndKeyboardState state);
 }
 
-public class ApplicationLogicRoot
+public sealed class ApplicationLogicRoot
 {
    private readonly TrayIconProxy _trayIcon;
    private MainWindow _mainWindow;
@@ -42,7 +42,7 @@ public class ApplicationLogicRoot
    {
       _mainWindow.InitializeComponent();
       ShowMainWindow();
-      _moverSizer.StartMonitoring();
+      _moverSizer.Start();
    }
 
    private void ShowMainWindow()
@@ -53,7 +53,7 @@ public class ApplicationLogicRoot
 
    public void Stop()
    {
-      _moverSizer.StopMonitoring();
+      _moverSizer.Stop();
       _trayIcon.Cleanup();
    }
 }

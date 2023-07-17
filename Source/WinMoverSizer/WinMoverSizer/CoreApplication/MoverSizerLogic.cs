@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using WinMoverSizer.Models;
 using WinMoverSizer.WinApi;
 
 namespace WinMoverSizer.CoreApplication;
 
-public class MoverSizerLogic
+public sealed class MoverSizerLogic
 {
    private List<IWinMoverStateObserver> _stateObservers = new();
+   private readonly WindowHierarchyBuilder _windowHierarchyBuilder;
 
    private static readonly HashSet<string> ClassNamesForWindowsThatShouldNotBeMovedOrResized = new()
    {
@@ -18,7 +20,18 @@ public class MoverSizerLogic
       "ZoomitClass", // window created by ZoomIt tool (https://learn.microsoft.com/en-us/sysinternals/downloads/zoomit) (it occupies entire deskttop)
    };
 
-   public void StartMonitoring()
+   private static readonly HashSet<string> ClassNamesForJavaDialogsWindows = new()
+   {
+      "SunAwtDialog", // AWT java dialog window (e.g. Jetbrains Rider find files window)
+      "SunAwtWindow" // AWT java window (e.g. Jetbrains Rider project manager window)
+   };
+
+   public MoverSizerLogic()
+   {
+      _windowHierarchyBuilder = new WindowHierarchyBuilder();
+   }
+
+   public void Start()
    {
       WinApiHelper.StartMonitoringKeyboardKeys(OnMouseOrKeyboardStateChanged);
       WinApiHelper.StartMonitoringMouseMovement(OnMouseOrKeyboardStateChanged);
@@ -26,8 +39,17 @@ public class MoverSizerLogic
 
    private void OnMouseOrKeyboardStateChanged()
    {
-      var currentState = GetCurrentMouseAndKeyboardState();
-      HandleStateChange(currentState);
+      try
+      {
+         var currentState = GetCurrentMouseAndKeyboardState();
+         HandleStateChange(currentState);
+      }
+      catch (Exception e)
+      {
+         Debug.WriteLine(e);
+         //UserInteractions.ShowExceptionDialog("Error While handling Mouse/Keyboard State changed event",e);
+      }
+
    }
 
    private void HandleStateChange(MouseAndKeyboardState currentState)
@@ -41,12 +63,14 @@ public class MoverSizerLogic
 
    private MouseAndKeyboardState GetCurrentMouseAndKeyboardState()
    {
-      PositionOnDesktop mousePosition = WinApiHelper.GetMousePosition();
+      var mousePosition = WinApiHelper.GetMousePoint();
       IntPtr windowHandleUnderCursor = WinApiHelper.GetWindowFromPoint(mousePosition);
       var originalWindowUnderCursor = GetWindowFromHandle(windowHandleUnderCursor);
       var windowToOperate = FindWindowToOperateOnFromWindowOnUnderCursor(windowHandleUnderCursor);
       var keyStates = WinApiHelper.GetKeyStates();
-      var windowList = WinApiHelper.GetWindowHierarchyFromPoint(mousePosition);
+
+      var windowList = _windowHierarchyBuilder.GetWindowHierarchyForWindow(windowHandleUnderCursor);
+
       var currentState = new MouseAndKeyboardState
       {
          MousePositionOnDesktop = mousePosition,
@@ -66,23 +90,24 @@ public class MoverSizerLogic
          return WindowData.Null;
       }
 
-      if (WinApiHelper.IsDesktopWindow(windowHandle))
+      if (WinApiHelper.IsHandlePointingToWholeDesktop(windowHandle))
       {
          return WindowData.Null;
       }
 
+      var windowFromHandle = GetWindowFromHandle(windowHandle);
       // get root window (top) for current application
-      while (ShouldContinueSearchingForParentWindow(windowHandle))
+      while (ShouldContinueSearchingForParentWindow(windowFromHandle))
       {
-         windowHandle = WinApiHelper.GetParent(windowHandle);
+         windowFromHandle = GetWindowFromHandle(windowFromHandle.ParentHandle);
       }
 
-      if (!IsWindowClassApplicableForResizeOrMove(windowHandle))
+      if (!IsWindowClassApplicableForResizeOrMove(windowFromHandle.ClassName))
       {
          return WindowData.Null;
       }
 
-      return GetWindowFromHandle(windowHandle);
+      return windowFromHandle;
    }
 
    private static WindowData GetWindowFromHandle(IntPtr windowHandle)
@@ -96,31 +121,36 @@ public class MoverSizerLogic
       return new WindowData()
       {
          Handle = windowHandle,
-         Rect = rect
+         Rect = rect,
+         ParentHandle = WinApiHelper.GetParent(windowHandle),
+         ClassName = WinApiHelper.GetClassName(windowHandle),
+         WindowStyleInfo = WinApiHelper.GetWindowStyleInfo(windowHandle)
       };
    }
 
-   private bool IsWindowClassApplicableForResizeOrMove(IntPtr windowHandle)
+   private bool IsWindowClassApplicableForResizeOrMove(string className)
    {
-      var className = WinApiHelper.GetClassName(windowHandle);
       return !ClassNamesForWindowsThatShouldNotBeMovedOrResized.Contains(className);
    }
 
-   private bool ShouldContinueSearchingForParentWindow(IntPtr windowHandle)
+   private bool ShouldContinueSearchingForParentWindow(WindowData windowHandle)
    {
-      var className = WinApiHelper.GetClassName(windowHandle);
-      var classNamesForDialogs = new HashSet<string>()
-      {
-         "#32770", // '#32770' means - Ms Windows dialog window
-         "SunAwtDialog", // AWT java dialog window (e.g. Jetbrains Rider find files window)
-         "SunAwtWindow" // AWT java window (e.g. Jetbrains Rider project manager window)
-      };
-      if (classNamesForDialogs.Contains(className))
+      // even though MS Windows Dialogs windows have
+      // "#32770" class name, we detect it differently, by checking window style
+      // this is why some windows with "#32770"  are actually 'inside' other type of windows and thus should not be considered for moving
+      // eg. MS outlook message preview window has this classname but is 'embedded' inside main outlook window
+      if (ClassNamesForJavaDialogsWindows.Contains(windowHandle.ClassName))
       {
          return false;
       }
 
-      return WinApiHelper.GetParent(windowHandle) != IntPtr.Zero;
+      if (windowHandle.WindowStyleInfo.HasCaption
+          || windowHandle.WindowStyleInfo.HasDialogFrame)
+      {
+         return false;
+      }
+
+      return windowHandle.ParentHandle != IntPtr.Zero;
    }
 
    public void RegisterStateObserver(IWinMoverStateObserver stateObserver)
@@ -131,7 +161,7 @@ public class MoverSizerLogic
       }
    }
 
-   public void StopMonitoring()
+   public void Stop()
    {
       WinApiHelper.StopMonitoringMouseMovement();
       WinApiHelper.StopMonitoringKeyboardKeys();

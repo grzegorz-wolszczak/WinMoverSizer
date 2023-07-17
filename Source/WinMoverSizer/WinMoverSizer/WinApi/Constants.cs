@@ -1,7 +1,7 @@
 ﻿namespace WinMoverSizer.WinApi;
 
 
-public class KeyMetadata
+public sealed class KeyMetadata
 {
    public readonly int Code;
    public readonly string LongName;

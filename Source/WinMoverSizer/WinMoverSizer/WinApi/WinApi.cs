@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using WindowSpy;
 using WinMoverSizer.Models;
 
 namespace WinMoverSizer.WinApi;
@@ -45,17 +44,23 @@ public static class WinApiHelper
    [DllImport("kernel32.dll")]
    private static extern IntPtr GetModuleHandle(string lpModuleName);
 
-   [DllImport("user32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+   [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
    static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
 
-   [DllImport("user32.dll", SetLastError=true)]
+   [DllImport("user32.dll", SetLastError = true)]
    static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
    private delegate IntPtr WinApiHookCallback(int nCode, IntPtr wParam, IntPtr lParam);
 
    [DllImport("user32.dll")]
    private static extern IntPtr SetWindowsHookEx(int hookType, WinApiHookCallback? callback, IntPtr hMod, uint dwThreadId);
+
+   [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+   private static extern IntPtr GetWindowLongPtr32(IntPtr hWnd, int nIndex);
+
+   [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+   private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
 
    [DllImport("user32.dll")]
    private static extern bool GetCursorPos(out POINT lpPoint);
@@ -91,10 +96,10 @@ public static class WinApiHelper
    private const int WM_MOUSEMOVE = 0x200;
    private const int WM_LBUTTONDOWN = 0x0201;
    private const int WM_RBUTTONDOWN = 0x0204;
-   private const int WM_RBUTTONUP =  0x0205;
-   private const int WM_LBUTTONUP  =  0x0202;
+   private const int WM_RBUTTONUP = 0x0205;
+   private const int WM_LBUTTONUP = 0x0202;
 
-   private const int WM_KEYDOWN =  0x0100;
+   private const int WM_KEYDOWN = 0x0100;
    private const int WM_KEYUP = 0x0101;
    private const int WM_SYSKEYDOWN = 0x0104;
    private const int WM_SYSKEYUP = 0x0105;
@@ -155,7 +160,7 @@ public static class WinApiHelper
       const uint SWP_SHOWWINDOW = 0x0040;
       const uint SWP_NOSIZE = 0x0001;
       // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos
-      SetWindowPos(handle,  IntPtr.Zero, X, Y,
+      SetWindowPos(handle, IntPtr.Zero, X, Y,
          0, 0, SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOSIZE);
    }
 
@@ -166,7 +171,6 @@ public static class WinApiHelper
       return rect;
    }
 
-
    private static bool IsKeyPressed(int keyCode)
    {
       const int KEY_PRESSED = 0x8000;
@@ -174,27 +178,19 @@ public static class WinApiHelper
       return (keyState & KEY_PRESSED) != 0;
    }
 
-   public static PositionOnDesktop GetMousePosition()
+   public static POINT GetMousePoint()
    {
       var mousePosition = new POINT();
       GetCursorPos(out mousePosition);
-      var pointOnScreen = new PositionOnDesktop()
-      {
-         X = mousePosition.x,
-         Y = mousePosition.y
-      };
-      return pointOnScreen;
+      return mousePosition;
    }
 
-   public static IntPtr GetWindowFromPoint(PositionOnDesktop position)
+
+   public static IntPtr GetWindowFromPoint(POINT position)
    {
-      POINT mousePosition = new POINT();
-      mousePosition.x = position.X;
-      mousePosition.y = position.Y;
-      var windowHandle = WindowFromPoint(mousePosition);
+      var windowHandle = WindowFromPoint(position);
       return windowHandle;
    }
-
 
    public static void StartMonitoringKeyboardKeys(Action onKeyboardKeyPressChangedCallback)
    {
@@ -208,22 +204,23 @@ public static class WinApiHelper
       {
          if (nCode >= 0 /*HC_ACTION*/)
          {
-
             if (
                wParam == (IntPtr) WM_KEYDOWN
                || wParam == (IntPtr) WM_KEYUP
                || wParam == (IntPtr) WM_SYSKEYDOWN
                || wParam == (IntPtr) WM_SYSKEYUP
-               )
+            )
             {
                if (wParam == (IntPtr) WM_KEYDOWN)
                {
                   Debug.WriteLine("WM_KEYDOWN");
                }
+
                if (wParam == (IntPtr) WM_KEYUP)
                {
                   Debug.WriteLine("WM_KEYUP");
                }
+
                onKeyboardKeyPressChangedCallback();
             }
          }
@@ -252,7 +249,7 @@ public static class WinApiHelper
                wParam == (IntPtr) WM_RBUTTONDOWN ||
                wParam == (IntPtr) WM_LBUTTONUP ||
                wParam == (IntPtr) WM_RBUTTONUP
-                )
+            )
             {
                onMouseMoveUserProvidedCallback();
             }
@@ -305,9 +302,7 @@ public static class WinApiHelper
       }
    }
 
-
-
-   public static bool IsDesktopWindow(IntPtr windowHandle)
+   public static bool IsHandlePointingToWholeDesktop(IntPtr windowHandle)
    {
       return windowHandle == DesktopHandle;
    }
@@ -330,34 +325,42 @@ public static class WinApiHelper
    }
 
 
-   public static WindowList GetWindowHierarchyFromPoint(PositionOnDesktop point)
+   public static WindowList GetWindowHierarchyFromPoint(POINT point)
    {
       var windowHandle = GetWindowFromPoint(point);
 
-      var result = new WindowList();
+      return GetWindowHierarchyForWindow(windowHandle);
+   }
+
+   public static WindowList GetWindowHierarchyForWindow(IntPtr windowHandle)
+   {
+      var list = new List<WindowInfo>();
 
       while (GetParent(windowHandle) != IntPtr.Zero)
       {
          var windowInfo = BuildWindowInfo(windowHandle);
-         result.Add(windowInfo);
+         list.Add(windowInfo);
          windowHandle = GetParent(windowHandle);
       }
-      result.Add(BuildWindowInfo(windowHandle)); // top parent
 
-      return result;
+      list.Add(BuildWindowInfo(windowHandle)); // top parent
+
+      return new WindowList(list);
    }
 
-   private static WindowInfo BuildWindowInfo(IntPtr handle)
+   public static WindowInfo BuildWindowInfo(IntPtr handle)
    {
       var windowText = GetWindowText(handle);
       var className = GetClassName(handle);
       var applicationName = GetApplication(handle);
+      WindowStyleInfo styleInfo = GetWindowStyleInfo(handle);
       return new WindowInfo()
       {
          Handle = handle,
          WindowText = windowText,
          ClassName = className,
-         ApplicationName = applicationName
+         ApplicationName = applicationName,
+         StyleInfo = styleInfo
       };
    }
 
@@ -378,5 +381,30 @@ public static class WinApiHelper
       }
 
       return String.Empty;
+   }
+
+   // This static method is required because Win32 does not support
+// GetWindowLongPtr directly
+   public static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
+   {
+      if (IntPtr.Size == 8)
+         return GetWindowLongPtr64(hWnd, nIndex);
+      else
+         return GetWindowLongPtr32(hWnd, nIndex);
+   }
+
+   public static WindowStyleInfo GetWindowStyleInfo(IntPtr windowHandle)
+   {
+      IntPtr result;
+      result = GetWindowLongPtr(windowHandle, (int) GetWindowLongIndex.GWL_STYLE);
+
+      var resultAsInt64 = result.ToInt64();
+      return new WindowStyleInfo()
+      {
+         HasCaption = (resultAsInt64 & (long) WindowStyles.WS_CAPTION) != 0,
+         HasDialogFrame = (resultAsInt64 & (long) WindowStyles.WS_DLGFRAME) != 0,
+         IsChild = (resultAsInt64 & (long) WindowStyles.WS_CHILD) != 0,
+         IsPopupWindow = (resultAsInt64 & (long) WindowStyles.WS_POPUP) != 0
+      };
    }
 }

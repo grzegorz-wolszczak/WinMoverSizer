@@ -5,7 +5,7 @@ using WinMoverSizer.WinApi;
 
 namespace WinMoverSizer.CoreApplication;
 
-public class WindowMover : IWinMoverStateObserver
+public sealed class WindowMover : IWinMoverStateObserver
 {
    private MouseAndKeyboardState? _currentlyMovedWindowState;
    private static readonly HashSet<int> WindowMoveKeyCombination =  new() {Keys.LeftAlt, Keys.LeftMouseButton};

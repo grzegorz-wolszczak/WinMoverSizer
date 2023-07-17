@@ -19,9 +19,9 @@ public partial class MainWindow : Window
    {
       labelMousePosition.Content = $"Cursor: {state.MousePositionOnDesktop}" + $"\nWindow handle to move: {state.CalculatedWindowToOperateOn?.Handle}";
       //labelWindowUnderMouse.Content = $"Window handle to move: {state.CalculatedWindowToOperateOn?.Handle}";
-      var asString = state.KeyStates.AsString();
+      //var asString = state.KeyStates.AsString();
       //keyPressedLabel.Content = $"Key pressed? : {asString}";
-      windowsHierarchyTextBlock.Text = state.WindowList.ToWindowInfoString();
+      windowsHierarchyTextBlock.Text = state.WindowList.AsString();
 
 
    }

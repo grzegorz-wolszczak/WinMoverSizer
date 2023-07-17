@@ -5,7 +5,7 @@ using WinMoverSizer.WinApi;
 
 namespace WinMoverSizer.Models;
 
-public class KeysPressed
+public sealed class KeysPressed
 {
    private readonly HashSet<KeyMetadata> _keysPressed = new();
    public KeysPressed(params KeyMetadata[] keys)

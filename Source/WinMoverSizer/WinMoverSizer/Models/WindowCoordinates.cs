@@ -1,6 +1,6 @@
 ﻿namespace WinMoverSizer.Models;
 
-public record WindowCoordinates
+public sealed record WindowCoordinates
 {
    public int X { get; set; }
    public int Y { get; set; }
